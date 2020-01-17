@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from "@angular/core";
-
+import { UserService } from "../../services/user.service";
 import { User } from "../../models/User";
 
 @Component({
@@ -19,49 +19,30 @@ export class UsersComponent implements OnInit {
   enableAdd: boolean = false;
   showUserForm: boolean = false;
   @ViewChild("userForm", { static: false }) form: any;
+  data: any;
 
-  constructor() {}
+  constructor(private userService: UserService) {}
 
   ngOnInit() {
-    this.users = [
-      {
-        firstName: "John",
-        lastName: "Doe",
-        email: "John@gmail.com",
-        isActive: true,
-        registered: new Date("01/02/2018 08:30:00"),
-        hide: true
-      },
-      {
-        firstName: "Kevin",
-        lastName: "Johnson",
-        email: "Kevin@yahoo.com",
-        isActive: false,
-        registered: new Date("03/11/2017 06:20:00"),
-        hide: true
-      },
-      {
-        firstName: "Karen",
-        lastName: "Williams",
-        email: "Karen@gmail.com",
-        isActive: true,
-        registered: new Date("11/02/2016 10:30:00"),
-        hide: true
-      }
-    ];
+    this.userService.getData().subscribe(data => {
+      console.log(data);
+    });
 
-    this.loaded = true;
+    this.userService.getUsers().subscribe(users => {
+      this.users = users;
+      this.loaded = true;
+    });
   }
 
   onSubmit({ value, valid }: { value: User; valid: boolean }) {
     if (!valid) {
-      console.log("form is not valid");
+      console.log("Form is not valid");
     } else {
       value.isActive = true;
       value.registered = new Date();
       value.hide = true;
 
-      this.users.unshift(value);
+      this.userService.addUser(value);
 
       this.form.reset();
     }
